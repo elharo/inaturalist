@@ -8,7 +8,7 @@
 
 # Patch SegmentationStatistic
 class SegmentationStatistic < ApplicationRecord
-  def self.generate_segmentation_data( start_date, end_date, use_database: false )
+  def self.generate_segmentation_int( start_date, end_date, use_database: false )
     segmentation_data = {}
     current_date = end_date
     num_days = ( end_date.to_date - start_date.to_date ).to_i
@@ -51,7 +51,7 @@ date_ranges = [
 
 # Generate data for each case
 active_data = date_ranges.map do | date_range |
-  SegmentationStatistic.generate_segmentation_int( date_range[:d1], date_range[:d2], date_range[:use_db] )
+  SegmentationStatistic.generate_segmentation_int( date_range[:d1], date_range[:d2], use_database: date_range[:use_db] )
 end
 
 # Extract required data for analysis
