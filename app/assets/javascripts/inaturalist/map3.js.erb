@@ -521,8 +521,20 @@ iNaturalist.Map.createMap = function(options) {
       map.fitBounds(bounds)
     }
   }
+  osmMapType = iNaturalist.Map.createOsmMapTypeForMap( map );
 
-  map.mapTypes.set( iNaturalist.Map.MapTypeId.OSM, iNaturalist.Map.createOsmMapTypeForMap( map ) );
+  osmMapType.getTile = function(coord, zoom, ownerDocument) {
+    var tile = ownerDocument.createElement('img');
+    tile.alt = '';
+    tile.src = this.getTileUrl(coord, zoom);
+    tile.onerror = function() {
+        console.error('Error loading tile at coordinates (' + coord.x + ', ' + coord.y + ') with zoom level ' + zoom);
+        console.error('Tile URL:', tile.src);
+    };
+    return tile;
+  };
+
+  map.mapTypes.set( iNaturalist.Map.MapTypeId.OSM, osmMapType );
   google.maps.event.addListener( map, "maptypeid_changed", function () {
     iNaturalist.Map.toggleOsmAttributionForMap( this );
   } );
