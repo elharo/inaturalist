@@ -1473,7 +1473,7 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
     // Required, even though not documented
     maxZoom: 19
   } );
-  osmMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
+  osmMapType.getTile = function(coord, zoom, ownerDocument) {
     var tile = ownerDocument.createElement('img');
     tile.src = "https://inaturalist-open-data.s3.amazonaws.com/photos/423896085/medium.jpeg";
     tile.onerror = function() {
@@ -1483,6 +1483,7 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
   };
   return osmMapType;
 }
+
 iNaturalist.Map.createOsmAttributionControl = function( position ) {
   var div = document.createElement( "div" );
   div.setAttribute( "id", "OsmAttributionControl" );
