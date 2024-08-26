@@ -1473,13 +1473,10 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
     // Required, even though not documented
     maxZoom: 19
   } );
+  osmMapType.baseGetTile = osmMapType.getTile;
   osmMapType.getTile = function(coord, zoom, ownerDocument) {
-    var tile = ownerDocument.createElement('img');
-    tile.src = "https://inaturalist-open-data.s3.amazonaws.com/photos/423896085/medium.jpeg";
-    tile.onerror = function() {
-      console.error('Tile URL:', tile.src);
-    };
-    return tile;
+    var node = osmMapType.baseGetTile(tileCoord, zoom, ownerDocument);
+    return node;
   };
   return osmMapType;
 }
