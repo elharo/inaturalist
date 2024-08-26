@@ -1474,13 +1474,13 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
     maxZoom: 19
   } );
   osmMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
-      var tile = ownerDocument.createElement('img');
-      tile.src = "https://inaturalist-open-data.s3.amazonaws.com/photos/423896085/medium.jpeg";
-      tile.onerror = function() {
-        console.error('Tile URL:', tile.src);
-      };
-      return tile;
-    }
+    var tile = ownerDocument.createElement('img');
+    tile.src = "https://inaturalist-open-data.s3.amazonaws.com/photos/423896085/medium.jpeg";
+    tile.onerror = function() {
+      console.error('Tile URL:', tile.src);
+    };
+    return tile;
+  };
   return osmMapType;
 }
 iNaturalist.Map.createOsmAttributionControl = function( position ) {
