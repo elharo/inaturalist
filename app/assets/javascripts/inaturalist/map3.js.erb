@@ -1467,7 +1467,7 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
       if (x < 0) x = tilesPerGlobe + x;
       return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
     },
-    getTile = function(coord, zoom, ownerDocument) {
+    getTile: function(coord, zoom, ownerDocument) {
       var tile = ownerDocument.createElement('img');
       tile.src = getTileUrl(coord, zoom);
       tile.onerror = function() {
