@@ -521,20 +521,8 @@ iNaturalist.Map.createMap = function(options) {
       map.fitBounds(bounds)
     }
   }
-  osmMapType = iNaturalist.Map.createOsmMapTypeForMap( map );
 
-  osmMapType.getTile = function(coord, zoom, ownerDocument) {
-    var tile = ownerDocument.createElement('img');
-    tile.alt = '';
-    tile.src = this.getTileUrl(coord, zoom);
-    tile.onerror = function() {
-        console.error('Error loading tile at coordinates (' + coord.x + ', ' + coord.y + ') with zoom level ' + zoom);
-        console.error('Tile URL:', tile.src);
-    };
-    return tile;
-  };
-
-  map.mapTypes.set( iNaturalist.Map.MapTypeId.OSM, osmMapType );
+  map.mapTypes.set( iNaturalist.Map.MapTypeId.OSM, iNaturalist.Map.createOsmMapTypeForMap( map ) );
   google.maps.event.addListener( map, "maptypeid_changed", function () {
     iNaturalist.Map.toggleOsmAttributionForMap( this );
   } );
@@ -1472,19 +1460,28 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
     ? "OpenStreetMap"
     : "OSM";
   // https://wiki.openstreetmap.org/wiki/Google_Maps_Example
-  return new google.maps.ImageMapType( {
+  osmMapType = new google.maps.ImageMapType( {
     getTileUrl: function(coord, zoom) {
       var tilesPerGlobe = 1 << zoom;
       var x = coord.x % tilesPerGlobe;
       if (x < 0) x = tilesPerGlobe + x;
       return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
     },
+    getTile = function(coord, zoom, ownerDocument) {
+      var tile = ownerDocument.createElement('img');
+      tile.src = getTileUrl(coord, zoom);
+      tile.onerror = function() {
+        console.error('Tile URL:', tile.src);
+      };
+      return tile;
+    }
     tileSize: new google.maps.Size( 256, 256 ),
     name: name,
     alt: I18n.t( "show_openstreetmap" ),
     // Required, even though not documented
     maxZoom: 19
   } );
+  return osmMapType;
 }
 iNaturalist.Map.createOsmAttributionControl = function( position ) {
   var div = document.createElement( "div" );
