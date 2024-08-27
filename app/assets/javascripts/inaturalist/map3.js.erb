@@ -1465,7 +1465,8 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
       var tilesPerGlobe = 1 << zoom;
       var x = coord.x % tilesPerGlobe;
       if (x < 0) x = tilesPerGlobe + x;
-      return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
+      if (zoom > 6) return "https://sdasdadsa.com";
+      else return "https://tile.openstreetmap.org/" + zoom + "/" + x + "/" + coord.y + ".png";
     },
     tileSize: new google.maps.Size( 256, 256 ),
     name: name,
@@ -1475,12 +1476,9 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
   } );
   osmMapType.baseGetTile = osmMapType.getTile;
   osmMapType.getTile = function(coord, zoom, ownerDocument) {
-    var key = zoom + '/' + coord.x + '/' + coord.y;
-    var img = new Image(256, 256);
-    img.src = osmMapType.getTileUrl(coord, zoom);
-    if (zoom > 6) img.src = "https://sdasdadsa.com"
-    img.onerror = function() { console.log("DEBUG ON ERROR") };
-    return img;
+    var node = osmMapType.baseGetTile(coord, zoom, ownerDocument);
+    node.onerror = function() { console.log("DEBUG ON ERROR") };
+    return node;
   };
   return osmMapType;
 }
