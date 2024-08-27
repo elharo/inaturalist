@@ -1485,6 +1485,14 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
   return osmMapType;
 }
 
+document.addEventListener('error', event => {
+    const target = event.target;
+    if (target.tagName === 'IMG') {
+        event.preventDefault();
+        console.log("onerror addEventListener DETECTED");
+    }
+}, true);
+
 iNaturalist.Map.createOsmAttributionControl = function( position ) {
   var div = document.createElement( "div" );
   div.setAttribute( "id", "OsmAttributionControl" );
