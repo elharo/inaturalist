@@ -1480,8 +1480,6 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
     img.src = this.getTileUrl(coord, zoom);
     if (zoom > 6) img.src = "https://sdasdadsa.com"
     img.onerror = function() { console.log("DEBUG ON ERROR") };
-    #var node = osmMapType.baseGetTile(coord, zoom, ownerDocument);
-    #node.onerror = function() { img.style.display = 'none'; };
     return img;
   };
   return osmMapType;
