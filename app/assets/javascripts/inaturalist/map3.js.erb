@@ -1476,9 +1476,13 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
   } );
   osmMapType.baseGetTile = osmMapType.getTile;
   osmMapType.getTile = function(coord, zoom, ownerDocument) {
-    var node = osmMapType.baseGetTile(coord, zoom, ownerDocument);
-    node.onerror = function() { console.log("DEBUG ON ERROR") };
-    return node;
+    try {
+      var node = osmMapType.baseGetTile(coord, zoom, ownerDocument);
+      return node;
+    }
+    catch(e) {
+      console.log("ERROR DETECTED IN NODE");
+    }
   };
   return osmMapType;
 }
