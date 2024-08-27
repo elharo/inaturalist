@@ -1477,7 +1477,7 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
   osmMapType.getTile = function(coord, zoom, ownerDocument) {
     var key = zoom + '/' + coord.x + '/' + coord.y;
     var img = new Image(256, 256);
-    img.src = getTileUrl(coord, zoom);
+    img.src = osmMapType.getTileUrl(coord, zoom);
     if (zoom > 6) img.src = "https://sdasdadsa.com"
     img.onerror = function() { console.log("DEBUG ON ERROR") };
     return img;
