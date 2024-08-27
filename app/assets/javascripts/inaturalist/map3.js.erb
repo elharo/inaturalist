@@ -1475,8 +1475,14 @@ iNaturalist.Map.createOsmMapTypeForMap = function ( map ) {
   } );
   osmMapType.baseGetTile = osmMapType.getTile;
   osmMapType.getTile = function(coord, zoom, ownerDocument) {
-    var node = osmMapType.baseGetTile(coord, zoom, ownerDocument);
-    return node;
+    var key = zoom + '/' + coord.x + '/' + coord.y;
+    var img = new Image(256, 256);
+    img.src = this.getTileUrl(coord, zoom);
+    if (zoom > 6) img.src = "https://sdasdadsa.com"
+    img.onerror = function() { console.log("DEBUG ON ERROR") };
+    #var node = osmMapType.baseGetTile(coord, zoom, ownerDocument);
+    #node.onerror = function() { img.style.display = 'none'; };
+    return img;
   };
   return osmMapType;
 }
