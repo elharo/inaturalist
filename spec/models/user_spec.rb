@@ -80,6 +80,7 @@ describe User, "associations" do
   it { is_expected.to have_many(:user_privileges).inverse_of(:user).dependent :delete_all }
   it { is_expected.to have_one(:flickr_identity).dependent :delete }
   it { is_expected.to have_one(:soundcloud_identity).dependent :delete }
+  it { is_expected.to have_one(:user_daily_active_category).dependent :delete }
   it { is_expected.to have_one(:user_parent).dependent(:destroy).inverse_of :user }
 end
 
@@ -1025,6 +1026,17 @@ describe User do
       keeper.merge( reject )
       keeper.reload
       expect( keeper.project_users.count ).to eq 1
+    end
+
+    it "retains the earliest created_at date" do
+      earlier_created_date = 1.year.ago
+      later_created_date = Time.now
+      reject.update_columns( created_at: earlier_created_date )
+      keeper.update_columns( created_at: later_created_date )
+      expect( keeper.created_at ).to be > reject.created_at
+      expect( keeper.created_at ).to eq later_created_date
+      keeper.merge( reject )
+      expect( keeper.created_at ).to eq earlier_created_date
     end
 
     describe "matching identifications on the same observation" do

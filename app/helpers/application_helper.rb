@@ -1089,9 +1089,22 @@ module ApplicationHelper
         t( :user_added_x_observations2_html, user: user, count: options[:count] )
       end
     when "Observation"
-      if notifier.is_a?(ObservationFieldValue)
-        t(:user_added_an_observation_field_html, :user => notifier_user_link, :field_name => truncate(notifier.observation_field.name),
-          :owner => you_or_login(resource.user, :capitalize_it => false))
+      if notifier.is_a?( ObservationFieldValue )
+        if notifier.updater && notifier.modified?
+          t( :user_updated_an_observation_field_html,
+            user: if options[:skip_links]
+                    notifier.updater.login
+                  else
+                    link_to( notifier.updater.login, person_url( notifier.updater ) )
+            end,
+            field_name: truncate( notifier.observation_field.name ),
+            owner: you_or_login( resource.user, capitalize_it: false ) )
+        else
+          t( :user_added_an_observation_field_html,
+            user: notifier_user_link,
+            field_name: truncate( notifier.observation_field.name ),
+            owner: you_or_login( resource.user, capitalize_it: false ) )
+        end
       else
         "unknown"
       end
@@ -1179,17 +1192,17 @@ module ApplicationHelper
         user_plural_opts = plural_opts.merge( user: notifier_user_name )
         case resource.class.name
         when "TaxonDrop" then t( :user_committed_taxon_drop_affecting_taxon, **user_singular_opts ).html_safe
-        when "TaxonMerge" then t( :user_committed_taxon_merge_affecting_taxa, **user_plural_opts ).html_safe
-        when "TaxonSplit" then t( :user_committed_taxon_split_affecting_taxa, **user_plural_opts ).html_safe
-        when "TaxonStage" then t( :user_committed_taxon_stage_affecting_taxa, **user_singular_opts ).html_safe
-        when "TaxonSwap" then t( :user_committed_taxon_swap_affecting_taxa, **user_plural_opts ).html_safe
+        when "TaxonMerge" then t( :user_committed_taxon_merge_affecting_taxa2, **user_plural_opts ).html_safe
+        when "TaxonSplit" then t( :user_committed_taxon_split_affecting_taxa2, **user_plural_opts ).html_safe
+        when "TaxonStage" then t( :user_committed_taxon_stage_affecting_taxa2, **user_singular_opts ).html_safe
+        when "TaxonSwap" then t( :user_committed_taxon_swap_affecting_taxa2, **user_plural_opts ).html_safe
         end
       else
         case resource.class.name
         when "TaxonDrop" then t( :taxon_drop_affecting_taxon, **singular_opts )
         when "TaxonMerge" then t( :taxon_merge_affecting_taxa, **plural_opts )
         when "TaxonSplit" then t( :taxon_split_affecting_taxa, **plural_opts )
-        when "TaxonStage" then t( :taxon_stage_affecting_taxa, **singular_opts )
+        when "TaxonStage" then t( :taxon_stage_affecting_taxon, **singular_opts )
         when "TaxonSwap" then t( :taxon_swap_affecting_taxa, **plural_opts )
         end
       end

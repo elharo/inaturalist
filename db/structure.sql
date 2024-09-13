@@ -322,7 +322,13 @@ CREATE TABLE public.announcements (
     locales text[] DEFAULT '{}'::text[],
     dismiss_user_ids integer[] DEFAULT '{}'::integer[],
     dismissible boolean DEFAULT false,
-    clients text[] DEFAULT '{}'::text[]
+    clients text[] DEFAULT '{}'::text[],
+    target_group_type character varying,
+    target_group_partition character varying,
+    include_donor_start_date date,
+    include_donor_end_date date,
+    exclude_donor_start_date date,
+    exclude_donor_end_date date
 );
 
 
@@ -5253,6 +5259,105 @@ ALTER SEQUENCE public.user_blocks_id_seq OWNED BY public.user_blocks.id;
 
 
 --
+-- Name: user_daily_active_categories; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_daily_active_categories (
+    id bigint NOT NULL,
+    user_id integer,
+    today_category character varying,
+    yesterday_category character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_daily_active_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_daily_active_categories_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_daily_active_categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_daily_active_categories_id_seq OWNED BY public.user_daily_active_categories.id;
+
+
+--
+-- Name: user_donations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_donations (
+    id bigint NOT NULL,
+    user_id integer,
+    donated_at timestamp without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_donations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_donations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_donations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_donations_id_seq OWNED BY public.user_donations.id;
+
+
+--
+-- Name: user_installations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_installations (
+    id bigint NOT NULL,
+    installation_id character varying(255),
+    oauth_application_id integer,
+    platform_id character varying(255),
+    user_id integer,
+    created_at date,
+    first_logged_in_at date
+);
+
+
+--
+-- Name: user_installations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_installations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_installations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_installations_id_seq OWNED BY public.user_installations.id;
+
+
+--
 -- Name: user_mutes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -6548,6 +6653,27 @@ ALTER TABLE ONLY public.user_blocks ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: user_daily_active_categories id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_daily_active_categories ALTER COLUMN id SET DEFAULT nextval('public.user_daily_active_categories_id_seq'::regclass);
+
+
+--
+-- Name: user_donations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_donations ALTER COLUMN id SET DEFAULT nextval('public.user_donations_id_seq'::regclass);
+
+
+--
+-- Name: user_installations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_installations ALTER COLUMN id SET DEFAULT nextval('public.user_installations_id_seq'::regclass);
+
+
+--
 -- Name: user_mutes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -7639,6 +7765,30 @@ ALTER TABLE ONLY public.update_actions
 
 ALTER TABLE ONLY public.user_blocks
     ADD CONSTRAINT user_blocks_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_daily_active_categories user_daily_active_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_daily_active_categories
+    ADD CONSTRAINT user_daily_active_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_donations user_donations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_donations
+    ADD CONSTRAINT user_donations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_installations user_installations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_installations
+    ADD CONSTRAINT user_installations_pkey PRIMARY KEY (id);
 
 
 --
@@ -10004,6 +10154,13 @@ CREATE INDEX index_trip_taxa_on_trip_id ON public.trip_taxa USING btree (trip_id
 
 
 --
+-- Name: index_udac_on_tc_yc; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_udac_on_tc_yc ON public.user_daily_active_categories USING btree (today_category, yesterday_category);
+
+
+--
 -- Name: index_update_actions_unique; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -10029,6 +10186,48 @@ CREATE INDEX index_user_blocks_on_override_user_id ON public.user_blocks USING b
 --
 
 CREATE INDEX index_user_blocks_on_user_id ON public.user_blocks USING btree (user_id);
+
+
+--
+-- Name: index_user_daily_active_categories_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_user_daily_active_categories_on_user_id ON public.user_daily_active_categories USING btree (user_id);
+
+
+--
+-- Name: index_user_donations_on_donated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_donations_on_donated_at ON public.user_donations USING btree (donated_at);
+
+
+--
+-- Name: index_user_donations_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_donations_on_user_id ON public.user_donations USING btree (user_id);
+
+
+--
+-- Name: index_user_installations_on_installation_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_user_installations_on_installation_id ON public.user_installations USING btree (installation_id);
+
+
+--
+-- Name: index_user_installations_on_installation_id_and_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_installations_on_installation_id_and_user_id ON public.user_installations USING btree (installation_id, user_id);
+
+
+--
+-- Name: index_user_installations_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_installations_on_user_id ON public.user_installations USING btree (user_id);
 
 
 --
@@ -10169,6 +10368,13 @@ CREATE INDEX index_users_on_observations_count ON public.users USING btree (obse
 --
 
 CREATE INDEX index_users_on_place_id ON public.users USING btree (place_id);
+
+
+--
+-- Name: index_users_on_remember_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_remember_token ON public.users USING btree (remember_token);
 
 
 --
@@ -10845,8 +11051,14 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240222032444'),
 ('20240326135332'),
 ('20240429211140'),
+('20240430163539'),
 ('20240530162451'),
 ('20240606154217'),
-('20240618044707');
+('20240618044707'),
+('20240620100000'),
+('20240709175116'),
+('20240715141936'),
+('20240716190326'),
+('20240828123245');
 
 
